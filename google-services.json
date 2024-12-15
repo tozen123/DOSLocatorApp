@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "689068943514",
+    "project_id": "doslocatorapp",
+    "storage_bucket": "doslocatorapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:689068943514:android:f7abb868b6e702fca09723",
+        "android_client_info": {
+          "package_name": "com.christianserwedevs.doslocator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7ffLwWz4N3M_aD9_2hrf2k567I_mA6TQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

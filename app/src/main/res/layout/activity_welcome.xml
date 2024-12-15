@@ -9,6 +9,7 @@
     android:background="@color/white"
 
     android:padding="16dp"
+    android:visibility="visible"
     >
 
 

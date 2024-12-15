@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,10 +17,13 @@
         android:theme="@style/Theme.DOSLocator"
         tools:targetApi="31">
         <activity
+            android:name=".Activity.UserRegistration.UserInformationRegistrationActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".NewUserActivity"
+            android:name=".Activity.UserRegistration.NewUserActivity"
             android:exported="false" />
         <activity
             android:name=".WelcomeActivity"
@@ -33,6 +40,11 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyC7ffLwWz4N3M_aD9_2hrf2k567I_mA6TQ" />
+
     </application>
 
 </manifest>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/lightblue"
+    >
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:src="@drawable/exclamation_mark"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        >
+
+    </ImageView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="Your child has sent Emergency Alert"
+        android:gravity="center"
+
+        android:textColor="@color/white"
+
+        android:fontFamily="@font/inter_bold"
+
+        android:paddingBottom="8dp" />
+
+    <TextView
+        android:id="@+id/child_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:text="Child Name"
+        android:fontFamily="@font/inter_bold"
+        android:gravity="center"
+
+        android:padding="10dp"
+       />
+
+    <TextView
+        android:id="@+id/timestamp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:text="Time"
+        />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="Rest Assured, Responders registered in the system are also been notified."
+         android:padding="10dp"
+        />
+
+    <Button
+        android:id="@+id/acknowledge_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Acknowledge and Track"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/lightblue" />
+</LinearLayout>

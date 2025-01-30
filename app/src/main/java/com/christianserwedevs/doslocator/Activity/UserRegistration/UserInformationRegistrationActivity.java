@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,7 +50,7 @@ public class UserInformationRegistrationActivity extends AppCompatActivity {
 
 
     private EditText parentPassword, childPassword, responderPassword;
-    LinearLayout parentOtherInformationSetup, childOtherInformationSetup, responderOtherInformationSetup, firstInformationGlobal;
+    ScrollView parentOtherInformationSetup, childOtherInformationSetup, responderOtherInformationSetup, firstInformationGlobal;
     TextView textView_header;
 
     FirebaseFirestore firestoreDatabase;
@@ -256,13 +257,27 @@ public class UserInformationRegistrationActivity extends AppCompatActivity {
 
                 if (!validateFields(_parentBirthdate, _parentContact, _parentEmail, _parentPassword)) return;
 
-                userData.put("birthdate", _parentBirthdate);
-                userData.put("contact", _parentContact);
-                userData.put("email", _parentEmail);
-                userData.put("password", _parentPassword);
+                firestoreDatabase.collection("parents")
+                        .whereEqualTo("email", _parentEmail)
+                        .get()
+                        .addOnSuccessListener(queryDocumentSnapshots -> {
+                            if (!queryDocumentSnapshots.isEmpty()) {
+                                Toast.makeText(UserInformationRegistrationActivity.this, "Error: This email is already used.", Toast.LENGTH_LONG).show();
+                            } else {
+                                userData.put("birthdate", _parentBirthdate);
+                                userData.put("contact", _parentContact);
+                                userData.put("email", _parentEmail);
+                                userData.put("password", _parentPassword);
 
-                addDataToFirestore("parents", userData);
+                                addDataToFirestore("parents", userData);
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(UserInformationRegistrationActivity.this, "Error checking email: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            System.err.println("Error checking email: " + e.getMessage());
+                        });
                 break;
+
 
             case "Child":
                 String _childBirthDate = childBirthdate.getText().toString().trim();

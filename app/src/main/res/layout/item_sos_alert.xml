@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="400dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@color/lightblue"
+
+    android:layout_gravity="center_horizontal"
+    >
+
+    <TextView
+        android:id="@+id/child_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text="Child Name"/>
+
+    <TextView
+        android:id="@+id/timestamp"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:text="Time: 12:00 AM"/>
+
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:text="Location: Unknown"/>
+
+    <Button
+        android:id="@+id/track_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Track"
+        android:layout_marginTop="8dp"/>
+
+
+</LinearLayout>

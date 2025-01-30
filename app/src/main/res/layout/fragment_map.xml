@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.MainNavigation.MapFragment">
+
 
 
 
@@ -15,4 +17,135 @@
 
     </fragment>
 
-</FrameLayout>
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_sos_can_still_track"
+        android:layout_width="140dp"
+        android:layout_height="30dp"
+
+        android:elevation="8dp"
+        android:fontFamily="@font/inter_black"
+        android:icon="@drawable/rounded_button"
+
+        android:text="I'M SAFE"
+        android:textColor="#FD0808"
+        android:textSize="8sp"
+
+        app:backgroundTint="@color/white"
+
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="20dp"
+
+        app:iconTint="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:rippleColor="@color/white" />
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_sos_alerts"
+        android:layout_width="140dp"
+        android:layout_height="30dp"
+
+        android:elevation="8dp"
+        android:fontFamily="@font/inter_black"
+        android:icon="@drawable/rounded_button"
+
+        android:text="SOS ALERTS HISTORY"
+        android:textColor="#FD0808"
+        android:textSize="8sp"
+
+        app:backgroundTint="@color/white"
+
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="20dp"
+
+        app:iconTint="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:rippleColor="@color/white" />
+
+
+    <ImageButton
+        android:id="@+id/fab_sos"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+
+        android:layout_marginBottom="30dp"
+
+        android:elevation="8dp"
+        android:fontFamily="@font/inter_black"
+        android:background="@drawable/sos_button"
+
+
+
+        app:layout_constraintBottom_toBottomOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+     />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_parent"
+        android:layout_width="90dp"
+        android:layout_height="30dp"
+
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="20dp"
+
+        android:elevation="8dp"
+        android:fontFamily="@font/inter_black"
+        android:icon="@drawable/rounded_button"
+
+        android:text="FIND PARENT"
+        android:textColor="#FD0808"
+        android:textSize="8sp"
+
+        app:backgroundTint="@color/white"
+
+        app:iconTint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:rippleColor="@color/white" />
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_child"
+        android:layout_width="90dp"
+        android:layout_height="30dp"
+
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="20dp"
+
+        android:elevation="8dp"
+        android:fontFamily="@font/inter_black"
+        android:icon="@drawable/rounded_button"
+
+        android:text="FIND CHILD"
+        android:textColor="#FD0808"
+        android:textSize="8sp"
+
+        app:backgroundTint="@color/white"
+
+        app:iconTint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:rippleColor="@color/white" />
+
+    <ImageButton
+        android:id="@+id/fab_gotomylocation"
+        android:layout_width="40dp"
+        android:layout_height="50dp"
+
+        android:layout_marginBottom="30dp"
+        android:layout_marginStart="20dp"
+        android:elevation="8dp"
+        android:fontFamily="@font/inter_black"
+        android:background="@drawable/location_user_pin"
+
+        android:textColor="#FD0808"
+        android:textSize="8sp"
+
+        app:elevation="8dp"
+
+        app:layout_constraintBottom_toBottomOf="@+id/map"
+        app:layout_constraintStart_toStartOf="parent"
+         />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

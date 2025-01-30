@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="14dp"
+    android:background="@drawable/rounded_box_container"
+    android:layout_margin="8dp"
+    android:elevation="8dp">
+
+    <!-- Child Info -->
+    <TextView
+        android:id="@+id/textViewChildName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Child Name"
+        android:textColor="@color/lightblue"
+        android:textStyle="bold"
+        android:fontFamily="@font/inter_regular"
+        android:textSize="21sp" />
+
+    <TextView
+        android:id="@+id/textViewChildId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User ID"
+        android:textSize="9sp"
+       />
+
+    <!-- Track Button -->
+    <Button
+        android:id="@+id/buttonTrackChild"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Track"
+        app:backgroundTint="@color/lightblue"
+        android:background="@drawable/rounded_button"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="16dp" />
+</LinearLayout>

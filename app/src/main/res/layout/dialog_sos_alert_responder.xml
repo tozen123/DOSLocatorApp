@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/lightblue">  <!-- Changed to a more urgent color -->
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:src="@drawable/exclamation_mark"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:text="Emergency Alert: A child needs immediate help!"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:fontFamily="@font/inter_bold"
+        android:paddingBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/child_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:text="Child Name"
+        android:fontFamily="@font/inter_bold"
+        android:gravity="center"
+        android:padding="10dp"
+        android:textColor="@color/white"/>
+
+    <TextView
+        android:id="@+id/timestamp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:text="Time of Emergency"
+        android:textColor="@color/white"/>
+
+    <TextView
+        android:id="@+id/location_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="Location: Retrieving..."
+        android:textColor="@color/white"
+        android:padding="10dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="Please proceed immediately and confirm your response."
+        android:textColor="@color/white"
+        android:padding="10dp"/>
+
+    <Button
+        android:id="@+id/acknowledge_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Respond to SOS and Track"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/lightblue"/>
+</LinearLayout>

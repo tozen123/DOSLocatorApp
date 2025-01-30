@@ -2,6 +2,7 @@ package com.christianserwedevs.doslocator;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -14,13 +15,15 @@ import com.christianserwedevs.doslocator.Fragments.MainNavigation.MessagesFragme
 import com.christianserwedevs.doslocator.Fragments.MainNavigation.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MainActivity extends AppCompatActivity implements MessagesFragment.OnSwitchToMapListener {
+public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private TextView textView_userType;
 
     // Fragments
-    private Fragment mapFragment, messagesFragment, profileFragment;
+    private Fragment mapFragment;
+    public Fragment messagesFragment;
+    private Fragment profileFragment;
     private Fragment activeFragment;
 
     private FragmentManager fragmentManager;
@@ -31,14 +34,12 @@ public class MainActivity extends AppCompatActivity implements MessagesFragment.
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Shared Preferences
         sharedPreferences = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
         textView_userType = findViewById(R.id.textView_userType);
 
         String userType = sharedPreferences.getString("userType", null);
         textView_userType.setText(userType != null ? capitalizeUserType(userType) : "User");
 
-        // Initialize Fragments
         mapFragment = new MapFragment();
         messagesFragment = new MessagesFragment();
         profileFragment = new ProfileFragment();
@@ -46,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements MessagesFragment.
 
         fragmentManager = getSupportFragmentManager();
 
-        // Add all fragments to the FragmentManager
         fragmentManager.beginTransaction()
                 .add(R.id.fragmentContainer, mapFragment, "MAP_FRAGMENT")
                 .add(R.id.fragmentContainer, messagesFragment, "MESSAGES_FRAGMENT")
@@ -55,29 +55,29 @@ public class MainActivity extends AppCompatActivity implements MessagesFragment.
                 .hide(profileFragment)
                 .commit();
 
-        // Set up Bottom Navigation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationBar);
 
-        // Set Map as the default selected item
-
+        bottomNavigationView.setSelectedItemId(R.id.navigation_map);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
-            if (itemId == R.id.navigation_messages) {
+            if (itemId == R.id.navigation_map) {
+                switchFragment(mapFragment);
+                return true;
+            } else if (itemId == R.id.navigation_messages) {
                 switchFragment(messagesFragment);
                 return true;
             } else if (itemId == R.id.navigation_profile) {
                 switchFragment(profileFragment);
                 return true;
-            } else {
-                switchFragment(mapFragment);
-                return true;
             }
+            return false;
         });
+
 
     }
 
-    private void switchFragment(Fragment targetFragment) {
+    public void switchFragment(Fragment targetFragment) {
         if (activeFragment != targetFragment) {
             fragmentManager.beginTransaction()
                     .hide(activeFragment)
@@ -85,6 +85,43 @@ public class MainActivity extends AppCompatActivity implements MessagesFragment.
                     .commit();
             activeFragment = targetFragment;
         }
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationBar);
+
+        int targetItemId = getMenuItemIdForFragment(targetFragment);
+        if (bottomNavigationView.getSelectedItemId() != targetItemId) {
+            bottomNavigationView.setOnItemSelectedListener(null); // 🚨 Temporarily remove listener
+            bottomNavigationView.setSelectedItemId(targetItemId);
+            bottomNavigationView.setOnItemSelectedListener(item -> {
+                return handleNavigationSelection(item);
+            });
+        }
+    }
+
+    private int getMenuItemIdForFragment(Fragment fragment) {
+        if (fragment instanceof MapFragment) {
+            return R.id.navigation_map;
+        } else if (fragment instanceof MessagesFragment) {
+            return R.id.navigation_messages;
+        } else if (fragment instanceof ProfileFragment) {
+            return R.id.navigation_profile;
+        }
+        return R.id.navigation_map; // Default
+    }
+
+    private boolean handleNavigationSelection(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.navigation_map) {
+            switchFragment(mapFragment);
+            return true;
+        } else if (itemId == R.id.navigation_messages) {
+            switchFragment(messagesFragment);
+            return true;
+        } else if (itemId == R.id.navigation_profile) {
+            switchFragment(profileFragment);
+            return true;
+        }
+        return false;
     }
 
     private String capitalizeUserType(String userType) {
@@ -99,15 +136,6 @@ public class MainActivity extends AppCompatActivity implements MessagesFragment.
                 return "User";
         }
     }
-    @Override
-    public void switchToMapFragment() {
-        switchFragment(mapFragment);
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationBar);
-        bottomNavigationView.getMenu().setGroupCheckable(0, true, false);
-        for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
-            bottomNavigationView.getMenu().getItem(i).setChecked(false);
-        }
-        bottomNavigationView.getMenu().setGroupCheckable(0, true, true);
-    }
+
 
 }

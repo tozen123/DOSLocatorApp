@@ -11,13 +11,6 @@
     android:paddingEnd="40dp"
     >
 
-    <Button
-        android:id="@+id/buttomBackToMap"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Back To Map"
-        >
 
-    </Button>
 
 </FrameLayout>

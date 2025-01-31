@@ -1,16 +1,52 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Fragments.MainNavigation.MessagesFragment"
-
     android:paddingTop="80dp"
     android:paddingBottom="80dp"
-    android:paddingStart="40dp"
-    android:paddingEnd="40dp"
-    >
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp">
+
+    <TextView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_bold"
+
+        android:text="Messaging"
+        android:textSize="36sp"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="20dp">
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/note"
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_regular"
+
+        android:text="Tap the user that you want to start message"
+        android:textSize="12sp"
+        app:layout_constraintTop_toBottomOf="@+id/header"
+      ></TextView>
 
 
+    <androidx.recyclerview.widget.RecyclerView
 
-</FrameLayout>
+        android:id="@+id/availabletochat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"
+
+        android:paddingBottom="12dp"
+        android:paddingTop="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/note"
+         />
+</androidx.constraintlayout.widget.ConstraintLayout>

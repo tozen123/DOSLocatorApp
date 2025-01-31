@@ -750,6 +750,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
     }
 
     private void updateChildMarker(String userId, String firstName, double latitude, double longitude) {
+        if (!isAdded() || getContext() == null) {
+            return; // Ensure the fragment is attached before proceeding
+        }
+
         LatLng childLocation = new LatLng(latitude, longitude);
 
         if (trackedChildrenMarkers.containsKey(userId)) {
@@ -772,6 +776,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
             trackedChildrenMarkers.put(userId, newMarker);
         }
     }
+
 
     private void clearTrackedChildrenMarkers() {
         for (Marker marker : trackedChildrenMarkers.values()) {

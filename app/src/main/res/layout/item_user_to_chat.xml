@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/lightblue"
+    android:clickable="true"
+    android:focusable="true"
+    android:layout_marginTop="8dp"
+    >
+
+    <TextView
+        android:id="@+id/userNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="21sp"
+        android:fontFamily="@font/inter_bold"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:text="User Name" />
+
+    <TextView
+        android:id="@+id/userEmailTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#56000000"
+        android:text="User Email" />
+</LinearLayout>

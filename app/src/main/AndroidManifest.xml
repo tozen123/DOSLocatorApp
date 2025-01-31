@@ -18,6 +18,9 @@
         android:theme="@style/Theme.DOSLocator"
         tools:targetApi="31">
         <activity
+            android:name=".Activity.MessagingActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activity.UserRegistration.UserInformationRegistrationActivity"
             android:exported="false" />
         <activity
@@ -45,7 +48,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyC7ffLwWz4N3M_aD9_2hrf2k567I_mA6TQ" />
-
     </application>
 
 </manifest>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/lightblue"
+
+
+    >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set Geofence/Boundary"
+        android:textSize="24sp"
+
+
+
+        android:textColor="@color/white"
+
+        android:fontFamily="@font/inter_bold"
+
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create a boundary for your child to alert you when he/she goes over the limit you have set."
+        android:textSize="16sp"
+        android:paddingBottom="10dp"
+
+
+
+        android:textColor="@color/white"
+
+        android:fontFamily="@font/inter_regular"
+
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set Radius: (Minimum of 100 meters) (Meters)"
+        android:textSize="16sp"
+        android:paddingTop="20dp"
+        android:paddingBottom="5dp"
+
+
+
+        android:textColor="@color/white"
+
+        android:fontFamily="@font/inter_bold"
+        />
+
+    <EditText
+        android:id="@+id/radiusInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:hint="Enter radius in meters"
+
+        android:fontFamily="@font/inter_regular"
+
+        android:background="@drawable/rounded_box_container"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Duration"
+        android:textSize="16sp"
+        android:paddingTop="20dp"
+        android:paddingBottom="5dp"
+
+
+
+        android:textColor="@color/white"
+
+        android:fontFamily="@font/inter_bold"
+        />
+
+    <Spinner
+        android:id="@+id/durationSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:fontFamily="@font/inter_regular"
+
+        android:background="@drawable/rounded_box_container"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:paddingTop="15dp">
+
+        <Button
+            android:id="@+id/cancelBoundary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:backgroundTint="#A9D9FF"
+            android:textColor="#474747"
+            />
+
+        <Button
+            android:id="@+id/saveBoundary"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:layout_marginStart="10dp"
+
+            android:backgroundTint="#A9D9FF"
+            android:textColor="#474747"
+            />
+    </LinearLayout>
+
+</LinearLayout>

@@ -3,7 +3,12 @@ package com.christianserwedevs.doslocator.Fragments.MainNavigation;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -13,18 +18,24 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -37,9 +48,11 @@ import com.christianserwedevs.doslocator.Fragments.ParentDetailsBottomSheet;
 import com.christianserwedevs.doslocator.Fragments.SOSAlertsDialogFragment;
 import com.christianserwedevs.doslocator.Fragments.SOSDialogFragment;
 import com.christianserwedevs.doslocator.Fragments.SOSDialogResponderFragment;
+import com.christianserwedevs.doslocator.MainActivity;
 import com.christianserwedevs.doslocator.Model.SOSAlertInfo;
 import com.christianserwedevs.doslocator.Prompts.ConfirmationDialog;
 import com.christianserwedevs.doslocator.R;
+import com.christianserwedevs.doslocator.SOSAlertService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -50,24 +63,31 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDialogFragment.SOSDialogListener {
 
@@ -103,15 +123,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
         fab_sos_can_still_track = rootView.findViewById(R.id.fab_sos_can_still_track);
 
 
-        // Get user type and set FAB visibility
-
         fabGoToMyLocation.setOnClickListener(v -> moveToMyLocation());
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("LoginPrefs", requireContext().MODE_PRIVATE);
         String userType = sharedPreferences.getString("userType", null);
         String parentEmail = sharedPreferences.getString("email", null);
 
-        setFabVisibility(userType);  // Set FAB visibility based on user type
+        setFabVisibility(userType);
 
         fabChild.setOnClickListener(v -> showChildrenListDialog(parentEmail));
         fabParent.setOnClickListener(v -> moveToParentLocation());
@@ -133,6 +151,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
 
 
         return rootView;
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("LoginPrefs", requireContext().MODE_PRIVATE);
+        String userType = sharedPreferences.getString("userType", null);
+        String parentEmail = sharedPreferences.getString("email", null);
+        Intent serviceIntent = new Intent(requireContext(), SOSAlertService.class);
+        serviceIntent.putExtra("userType", userType);
+        serviceIntent.putExtra("parentEmail", parentEmail);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            requireActivity().startForegroundService(serviceIntent);
+        } else {
+            requireActivity().startService(serviceIntent);
+        }
     }
     private void showAlertsList() {
         firestoreDatabase.collection("sos_alerts")
@@ -288,6 +323,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
 
 
     private void showSOSAlertDialog(String childName, String timestamp, String parentEmail, String documentName, Double latitude, Double longitude) {
+        if (!isAdded() || getChildFragmentManager().isStateSaved()) {
+            return;  // Prevent crash if the fragment is not in a valid state
+        }
+
         SOSDialogFragment dialogFragment = SOSDialogFragment.newInstance(
                 childName,
                 timestamp,
@@ -301,8 +340,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
 
 
     private void showSOSAlertDialogResponder(String childName, String timestamp, String documentName, Double latitude, Double longitude) {
-        if (!isAdded() || getActivity() == null) {
-            return;
+        if (!isAdded() || getChildFragmentManager().isStateSaved()) {
+            return;  // Prevent crash if the fragment is not in a valid state
         }
 
         SOSDialogResponderFragment dialogFragment = SOSDialogResponderFragment.newInstance(
@@ -325,6 +364,123 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
             Toast.makeText(requireContext(), "Parent's location is not available yet.", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+
+
+    private HashMap<String, Circle> childBoundaryCircles = new HashMap<>(); // Store circle references
+
+    private void checkBoundaryExpiration(String userId) {
+        firestoreDatabase.collection("children").document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists() && documentSnapshot.contains("boundary_details")) {
+                        List<Map<String, Object>> boundaryDetailsList = (List<Map<String, Object>>) documentSnapshot.get("boundary_details");
+
+                        if (boundaryDetailsList != null && !boundaryDetailsList.isEmpty()) {
+                            // Get the most recent boundary (last item in the list)
+                            Map<String, Object> latestBoundary = boundaryDetailsList.get(boundaryDetailsList.size() - 1);
+
+                            if (latestBoundary.containsKey("startDate") && latestBoundary.containsKey("duration") &&
+                                    latestBoundary.containsKey("latitude") && latestBoundary.containsKey("longitude") &&
+                                    latestBoundary.containsKey("radius")) {
+
+                                String startDateStr = latestBoundary.get("startDate").toString();
+                                String durationStr = latestBoundary.get("duration").toString();
+                                double latitude = Double.parseDouble(latestBoundary.get("latitude").toString());
+                                double longitude = Double.parseDouble(latestBoundary.get("longitude").toString());
+                                double radius = Double.parseDouble(latestBoundary.get("radius").toString());
+
+                                // Convert `startDate` from string to Date
+                                SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+                                try {
+                                    Date startDate = sdf.parse(startDateStr);
+                                    long durationMillis = getDurationInMillis(durationStr); // Convert duration to milliseconds
+                                    long expirationTime = startDate.getTime() + durationMillis; // Expiration timestamp
+
+                                    long currentTime = System.currentTimeMillis(); // Get current system time
+
+                                    if (currentTime >= expirationTime) {
+                                        // 🔥 Boundary has expired - Remove it
+                                        removeBoundary(userId);
+                                    } else {
+                                        // 🔥 Draw the boundary if it's still active
+                                        LatLng boundaryCenter = new LatLng(latitude, longitude);
+
+                                        if (childBoundaryCircles.containsKey(userId)) {
+                                            // Update existing circle
+                                            childBoundaryCircles.get(userId).setCenter(boundaryCenter);
+                                            childBoundaryCircles.get(userId).setRadius(radius);
+                                        } else {
+                                            // Create new circle
+                                            Circle newCircle = googleMap.addCircle(new CircleOptions()
+                                                    .center(boundaryCenter)
+                                                    .radius(radius)  // Radius in meters
+                                                    .strokeWidth(2f)
+                                                    .fillColor(0x55FFFFFF)); // 🔥 Semi-transparent WHITE fill
+                                            childBoundaryCircles.put(userId, newCircle);
+                                        }
+                                    }
+
+                                } catch (ParseException e) {
+                                    Log.e("Boundary", "Error parsing startDate: " + e.getMessage());
+                                }
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Error checking boundary expiration", e));
+    }
+
+    private long getDurationInMillis(String durationStr) {
+        switch (durationStr) {
+            case "30 minutes":
+                return 30 * 60 * 1000; // 30 minutes in milliseconds
+            case "1 hour":
+                return 60 * 60 * 1000; // 1 hour in milliseconds
+            case "8 hours":
+                return 8 * 60 * 60 * 1000; // 8 hours in milliseconds
+            case "24 hours":
+                return 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+            default:
+                return 0; // Default case (should not happen)
+        }
+    }
+
+
+    private Handler boundaryHandler = new Handler(Looper.getMainLooper());
+    private final long CHECK_INTERVAL = 60 * 1000; // 60 seconds (1 minute)
+
+    private void startBoundaryExpirationChecker(String userId) {
+        checkBoundaryExpiration(userId);
+        boundaryHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkBoundaryExpiration(userId);
+                boundaryHandler.postDelayed(this, CHECK_INTERVAL); // Run again after 1 minute
+            }
+        }, CHECK_INTERVAL);
+    }
+
+
+    private void removeBoundary(String userId) {
+        // Remove the circle from the map
+        if (childBoundaryCircles.containsKey(userId)) {
+            childBoundaryCircles.get(userId).remove();
+            childBoundaryCircles.remove(userId);
+            Log.d("Boundary", "Boundary removed for user: " + userId);
+        }
+
+        // Delete boundary details from Firestore
+        firestoreDatabase.collection("children").document(userId)
+                .update("boundary_details", FieldValue.delete()) // Deletes the entire boundary_details array
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Boundary details deleted for user: " + userId))
+                .addOnFailureListener(e -> Log.e("Firestore", "Error deleting boundary details", e));
+    }
+
+
+    private HashMap<String, Circle> childCircles = new HashMap<>();
+
 
 
     private void autoTrackAllChildren(String parentEmail) {
@@ -360,7 +516,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
 
                             String fullName = firstName;
                             LatLng childLocation = new LatLng(latitude, longitude);
-
+                            checkGeofenceViolation(userId, childLocation);
                             // Adjust position if multiple markers have the same location
                             childLocation = adjustOverlappingMarkerPosition(updatedChildLocations, childLocation);
 
@@ -384,13 +540,196 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
                                 );
                                 childMarkers.put(userId, newMarker);
                             }
+
+                            if (document.contains("boundary_details")) {
+                                fetchBoundaryAndDrawCircle(userId, childLocation);
+                            } else {
+                                if (childCircles.containsKey(userId)) {
+                                    childCircles.get(userId).remove();
+                                    childCircles.remove(userId);
+                                }
+                            }
                         }
                     } else {
                         Toast.makeText(requireContext(), "No children associated with this account.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
+    private void checkGeofenceViolation(String userId, LatLng childLocation) {
+        firestoreDatabase.collection("children").document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists() && documentSnapshot.contains("boundary_details")) {
+                        List<Map<String, Object>> boundaryDetailsList = (List<Map<String, Object>>) documentSnapshot.get("boundary_details");
 
+                        if (boundaryDetailsList != null && !boundaryDetailsList.isEmpty()) {
+                            // Get the most recent boundary (last item in the list)
+                            Map<String, Object> latestBoundary = boundaryDetailsList.get(boundaryDetailsList.size() - 1);
+
+                            if (latestBoundary.containsKey("latitude") &&
+                                    latestBoundary.containsKey("longitude") &&
+                                    latestBoundary.containsKey("radius")) {
+
+                                double boundaryLat = Double.parseDouble(latestBoundary.get("latitude").toString());
+                                double boundaryLng = Double.parseDouble(latestBoundary.get("longitude").toString());
+                                double radius = Double.parseDouble(latestBoundary.get("radius").toString());
+
+                                LatLng boundaryCenter = new LatLng(boundaryLat, boundaryLng);
+
+                                // 🔥 Calculate distance between child's location and boundary center
+                                float[] distance = new float[1];
+                                Location.distanceBetween(childLocation.latitude, childLocation.longitude,
+                                        boundaryCenter.latitude, boundaryCenter.longitude, distance);
+
+                                if (distance[0] > radius) {
+                                    // 🔥 Child is OUTSIDE the boundary - Notify parent
+                                    triggerGeofenceAlert(userId);
+                                }
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Error fetching boundary details", e));
+    }
+
+
+    private HashSet<String> alertedChildren = new HashSet<>(); // Store already alerted children
+
+    private void triggerGeofenceAlert(String userId) {
+        if (alertedChildren.contains(userId)) {
+            return; // 🔥 Prevent duplicate alerts
+        }
+
+        triggerGeofenceNotification(userId);
+
+        alertedChildren.add(userId);
+
+        // Get child details
+        firestoreDatabase.collection("children").document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String childName = documentSnapshot.getString("firstName") + " " + documentSnapshot.getString("lastName");
+
+                        // Get current timestamp
+                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+                        String currentTime = sdf.format(new Date());
+
+                        // Inflate custom dialog layout
+                        LayoutInflater inflater = LayoutInflater.from(requireContext());
+                        View dialogView = inflater.inflate(R.layout.dialog_geofence_alert, null);
+
+                        // Set child name and timestamp
+                        TextView nameTextView = dialogView.findViewById(R.id.child_name);
+                        TextView timestampTextView = dialogView.findViewById(R.id.timestamp);
+                        nameTextView.setText(childName);
+                        timestampTextView.setText("Time: " + currentTime);
+
+                        // Show custom dialog
+                        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                        builder.setView(dialogView);
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+
+                        // Handle button click
+                        Button okayButton = dialogView.findViewById(R.id.okay_button);
+                        okayButton.setOnClickListener(v -> dialog.dismiss());
+
+                        // 🔥 Remove the child from alertedChildren after a delay (e.g., 5 min)
+                        new Handler(Looper.getMainLooper()).postDelayed(() -> alertedChildren.remove(userId), 5 * 60 * 1000);
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Error fetching child details", e));
+    }
+
+    private void triggerGeofenceNotification(String userId) {
+        firestoreDatabase.collection("children").document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String childName = documentSnapshot.getString("firstName") + " " + documentSnapshot.getString("lastName");
+
+                        // Get current timestamp
+                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+                        String currentTime = sdf.format(new Date());
+
+                        // 🔥 Send notification
+                        sendGeofenceNotification(childName, currentTime);
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Error fetching child details", e));
+    }
+
+    private static final String CHANNEL_ID = "GeofenceAlertChannel";
+
+    private void sendGeofenceNotification(String childName, String timestamp) {
+        NotificationManager notificationManager = (NotificationManager) requireContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // 🔥 Create a Notification Channel for Android 8.0+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Geofence Alerts",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        // 🔥 Intent to open MainActivity when notification is clicked
+        Intent intent = new Intent(requireContext(), MainActivity.class);
+        intent.putExtra("open_map_fragment", true);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                requireContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        // 🔥 Build the notification
+        Notification notification = new NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+                .setContentTitle("Boundary Alert")
+                .setContentText(childName + " has exited their boundary at " + timestamp)
+                .setSmallIcon(R.drawable.logo_app) // Change to your alert icon
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .build();
+
+        // 🔥 Send notification
+        if (notificationManager != null) {
+            notificationManager.notify((int) System.currentTimeMillis(), notification);
+        }
+    }
+
+    private void fetchBoundaryAndDrawCircle(String userId, LatLng childLocation) {
+        firestoreDatabase.collection("children").document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists() && documentSnapshot.contains("boundary_details")) {
+                        List<Map<String, Object>> boundaryDetailsList = (List<Map<String, Object>>) documentSnapshot.get("boundary_details");
+
+                        if (boundaryDetailsList != null && !boundaryDetailsList.isEmpty()) {
+                            Map<String, Object> latestBoundary = boundaryDetailsList.get(boundaryDetailsList.size() - 1);
+
+                            if (latestBoundary.containsKey("radius")) {
+                                double radius = Double.parseDouble(latestBoundary.get("radius").toString());
+
+                                if (childCircles.containsKey(userId)) {
+                                    childCircles.get(userId).setCenter(childLocation);
+                                    childCircles.get(userId).setRadius(radius);
+                                } else {
+                                    Circle newCircle = googleMap.addCircle(new CircleOptions()
+                                            .center(childLocation)
+                                            .radius(radius)
+                                            .strokeWidth(2f)
+                                            .fillColor(0x55FFFFFF));
+                                    childCircles.put(userId, newCircle);
+                                }
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Error fetching boundary details", e));
+    }
 
     public Bitmap getMarkerBitmapFromView(Context context, int layoutResId, String labelText) {
         // Inflate the custom marker layout
@@ -567,16 +906,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
             requestLocationPermission();
         }
 
-//        // Listener to detect when the user moves the map manually
-//        googleMap.setOnCameraMoveStartedListener(reason -> {
-//            if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-//                isMapBeingMovedByUser = true;  // User is moving the map
-//            }
-//        });
-//
-//        googleMap.setOnCameraIdleListener(() -> isMapBeingMovedByUser = false);  // Reset when the map stops moving
+        // Define the bounding area for Camarines Norte, Philippines
+        LatLngBounds camarinesNorteBounds = new LatLngBounds(
+                new LatLng(13.7840, 122.3153), // Southwest corner
+                new LatLng(14.3741, 123.0055)  // Northeast corner
+        );
 
-// **Set Maximum Zoom Level**
+        // Apply the restriction
+        googleMap.setLatLngBoundsForCameraTarget(camarinesNorteBounds);
+
+
+        //        // Listener to detect when the user moves the map manually
+        //        googleMap.setOnCameraMoveStartedListener(reason -> {
+        //            if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+        //                isMapBeingMovedByUser = true;  // User is moving the map
+        //            }
+        //        });
+        //
+        //        googleMap.setOnCameraIdleListener(() -> isMapBeingMovedByUser = false);  // Reset when the map stops moving
+
+        // **Set Maximum Zoom Level**
         googleMap.setMaxZoomPreference(21.0f); // Example: Maximum zoom level 18
         googleMap.setMinZoomPreference(15.0f); // Optional: Set a minimum zoom level
 
@@ -599,7 +948,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
 
         if ("children".equals(userType)) {
             fetchParentEmailAndTrackParent(userId);
-
+            startBoundaryExpirationChecker(userId);
         } else if ("parents".equals(userType)) {
             String parentEmail = sharedPreferences.getString("email", null);
 
@@ -902,6 +1251,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
+                        String uid = userId;
                         String fullName = documentSnapshot.getString("firstName") + " " +
                                 (documentSnapshot.getString("middleName") != null ? documentSnapshot.getString("middleName") + " " : "") +
                                 documentSnapshot.getString("lastName");
@@ -910,7 +1260,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, SOSDial
                         String lastKnown = documentSnapshot.getString("lastKnownLocation");
 
                         // Show bottom sheet with child details
-                        com.christianserwedevs.doslocator.Fragments.MainNavigation.ChildDetailsBottomSheet bottomSheet = com.christianserwedevs.doslocator.Fragments.MainNavigation.ChildDetailsBottomSheet.newInstance(fullName, birthdate, contactNumber, lastKnown);
+                        com.christianserwedevs.doslocator.Fragments.MainNavigation.ChildDetailsBottomSheet bottomSheet = com.christianserwedevs.doslocator.Fragments.MainNavigation.ChildDetailsBottomSheet.newInstance(fullName, birthdate, contactNumber, lastKnown, uid);
                         bottomSheet.show(getChildFragmentManager(), "child_details_bottom_sheet");
                     } else {
                         Toast.makeText(requireContext(), "No details found for this child", Toast.LENGTH_SHORT).show();

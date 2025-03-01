@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="@drawable/child_details_bottom_sheet"
-    >
+    android:background="@drawable/child_details_bottom_sheet">
 
     <TextView
         android:id="@+id/child_name"
@@ -16,14 +16,12 @@
         android:text="Name"
 
         android:textColor="@color/white"
-        android:fontFamily="@font/inter_bold"
-        />
+        android:fontFamily="@font/inter_bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
@@ -32,10 +30,10 @@
             android:textSize="16sp"
 
             android:textColor="@color/white"
-            android:fontFamily="@font/inter_bold"
-            >
+            android:fontFamily="@font/inter_bold">
 
         </TextView>
+
         <TextView
             android:id="@+id/child_lastknown_location"
             android:layout_width="match_parent"
@@ -44,8 +42,7 @@
             android:textSize="16sp"
 
             android:textColor="@color/white"
-            android:fontFamily="@font/inter_regular"
-            />
+            android:fontFamily="@font/inter_regular" />
     </LinearLayout>
 
 
@@ -56,8 +53,7 @@
         android:layout_height="wrap_content"
         android:text="Birthdate"
         android:textColor="@color/white"
-        android:fontFamily="@font/inter_regular"
-        />
+        android:fontFamily="@font/inter_regular" />
 
 
     <TextView
@@ -67,19 +63,30 @@
         android:text="Contact Number"
 
         android:textColor="@color/white"
-        android:fontFamily="@font/inter_regular"/>
+        android:fontFamily="@font/inter_regular" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        >
+        android:layout_marginTop="24dp">
+
         <ImageButton
             android:id="@+id/openMessaging"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/message_icon"
 
+
+            >
+
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/openGeoBoundary"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/geoboundary"
+            android:layout_marginLeft="28dp"
 
             >
 

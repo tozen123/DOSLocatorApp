@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+
+
         sharedPreferences = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
         textView_userType = findViewById(R.id.textView_userType);
 
@@ -73,10 +75,15 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
-
+        // **Handle Intent from Notification**
+        if (getIntent().getBooleanExtra("open_map_fragment", false)) {
+            openMapFragment();
+        }
 
     }
-
+    private void openMapFragment() {
+        switchFragment(mapFragment);
+    }
     public void switchFragment(Fragment targetFragment) {
         if (activeFragment != targetFragment) {
             fragmentManager.beginTransaction()
